@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>盘搜 · 资源合集</title>
+
+<!-- 主题预设：必须在 CSS 前执行，避免打开时闪一下 -->
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem('link-theme');
+    var sys = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.dataset.theme = saved || sys;
+  } catch (e) {
+    document.documentElement.dataset.theme = 'dark';
+  }
+})();
+</script>
+
+<style>
+  /* ================= 暗色主题（默认） ================= */
+  :root {
+    --bg: #0a0c10;
+    --card: rgba(255, 255, 255, 0.06);
+    --card-hover: rgba(255, 255, 255, 0.12);
+    --border: rgba(255, 255, 255, 0.09);
+    --border-hover: rgba(255, 255, 255, 0.18);
+    --text: #f2f2f7;
+    --text-dim: #9b9ba3;
+    --accent: #5b9dff;
+    --icon-bg: rgba(255, 255, 255, 0.08);
+    --avatar-bg: linear-gradient(135deg, #2b3346, #171b23);
+    --avatar-border: rgba(255, 255, 255, 0.18);
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+    --glow-1: rgba(91, 157, 255, 0.16);
+    --glow-2: rgba(168, 85, 247, 0.10);
+    --radius: 18px;
+  }
+
+  /* ================= 亮色主题 ================= */
+  :root[data-theme="light"] {
+    --bg: #eef1f6;
+    --card: rgba(255, 255, 255, 0.72);
+    --card-hover: rgba(255, 255, 255, 0.95);
+    --border: rgba(18, 24, 40, 0.08);
+    --border-hover: rgba(18, 24, 40, 0.16);
+    --text: #14161a;
+    --text-dim: #6b7280;
+    --accent: #2f6fed;
+    --icon-bg: rgba(18, 24, 40, 0.06);
+    --avatar-bg: linear-gradient(135deg, #dbe4f5, #c3d1ea);
+    --avatar-border: rgba(18, 24, 40, 0.10);
+    --shadow: 0 8px 26px rgba(31, 45, 80, 0.14);
+    --glow-1: rgba(91, 157, 255, 0.22);
+    --glow-2: rgba(168, 85, 247, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 48px 20px 64px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  /* 背景光晕 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 10%, var(--glow-1), transparent 42%),
+      radial-gradient(circle at 80% 90%, var(--glow-2), transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.35s ease;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ================= 主题切换按钮 ================= */
+  .theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s, color 0.25s;
+  }
+  .theme-toggle:hover { background: var(--card-hover); border-color: var(--border-hover); transform: scale(1.06); }
+  .theme-toggle:active { transform: scale(0.94); }
+  .theme-toggle svg { width: 19px; height: 19px; display: block; }
+
+  /* 暗色时显示太阳（点它切亮色），亮色时显示月亮 */
+  [data-theme="dark"] .icon-moon { display: none; }
+  [data-theme="light"] .icon-sun { display: none; }
+
+  /* ================= 头部资料 ================= */
+  .avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--avatar-border);
+    box-shadow: var(--shadow);
+    background: var(--avatar-bg);
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+    flex-shrink: 0;
+    transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .name {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-align: center;
+    transition: color 0.35s ease;
+  }
+
+  .handle {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    margin-bottom: 10px;
+    transition: color 0.35s ease;
+  }
+
+  .bio {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 28px;
+    max-width: 320px;
+    transition: color 0.35s ease;
+  }
+
+  /* ================= 链接按钮 ================= */
+  .links {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .link-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14.5px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: background 0.25s, border-color 0.25s, transform 0.18s, color 0.25s, box-shadow 0.25s;
+  }
+
+  .link-btn:hover {
+    background: var(--card-hover);
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+
+  .link-btn:active { transform: translateY(0); }
+
+  .link-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+    background: var(--icon-bg);
+    transition: background 0.35s ease;
+  }
+
+  /* 每个链接可单独设置图标底色 */
+  .link-icon.blue   { background: rgba(91, 157, 255, 0.18); }
+  .link-icon.green  { background: rgba(48, 209, 88, 0.16); }
+  .link-icon.purple { background: rgba(168, 85, 247, 0.16); }
+  .link-icon.orange { background: rgba(255, 159, 10, 0.16); }
+
+  .link-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .link-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.35s ease;
+  }
+
+  .link-sub {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.35s ease;
+  }
+
+  .link-arrow {
+    flex-shrink: 0;
+    color: var(--text-dim);
+    font-size: 16px;
+    transition: transform 0.18s, color 0.25s;
+  }
+
+  .link-btn:hover .link-arrow {
+    transform: translateX(3px);
+    color: var(--text);
+  }
+
+  /* ================= 社交小图标 ================= */
+  .socials {
+    display: flex;
+    gap: 18px;
+    margin-top: 32px;
+  }
+
+  .socials a {
+    color: var(--text-dim);
+    font-size: 20px;
+    text-decoration: none;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .socials a:hover { color: var(--text); }
+
+  /* ================= 页脚 ================= */
+  .footer {
+    margin-top: 36px;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.7;
+    opacity: 0.75;
+    transition: color 0.35s ease;
+  }
+
+  /* ================= 移动端 ================= */
+  @media (max-width: 420px) {
+    body { padding: 36px 16px 48px; }
+    .avatar { width: 76px; height: 76px; font-size: 26px; }
+    .name { font-size: 19px; }
+    .link-btn { padding: 13px 14px; }
+    .link-icon { width: 32px; height: 32px; font-size: 15px; }
+    .theme-toggle { top: 14px; right: 14px; width: 38px; height: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 主题切换按钮 -->
+<button class="theme-toggle" id="themeToggle" aria-label="切换亮色/暗色主题" title="切换亮色/暗色">
+  <!-- 太阳：暗色模式下显示 -->
+  <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4.2"></circle>
+    <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"></path>
+  </svg>
+  <!-- 月亮：亮色模式下显示 -->
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+</button>
+
+<div class="page">
+
+  <!-- 头像 -->
+  <div class="avatar">盘</div>
+
+  <!-- 名称 / 账号 / 简介 -->
+  <div class="name">盘搜</div>
+  <div class="handle">@voup</div>
+  <div class="bio">
+    资源均免费分享，无任何套路<br>
+    希望保存这个地址，每日更新
+  </div>
+
+  <!-- 链接按钮列表 -->
+  <div class="links">
+
+    <a class="link-btn" href="https://你的资源合集地址" target="_blank" rel="noopener">
+      <span class="link-icon blue">📂</span>
+      <span class="link-text">
+        <span class="link-title">资源合集（每日更新）</span>
+        <span class="link-sub">点此进入主目录</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-btn" href="https://你的游戏站地址" target="_blank" rel="noopener">
+      <span class="link-icon green">🎮</span>
+      <span class="link-text">
+        <span class="link-title">盘搜游戏站</span>
+        <span class="link-sub">精选游戏资源</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-btn" href="https://你的资源频道地址" target="_blank" rel="noopener">
+      <span class="link-icon purple">📢</span>
+      <span class="link-text">
+        <span class="link-title">资源频道</span>
+        <span class="link-sub">第一时间获取更新</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-btn" href="https://你的粉丝群地址" target="_blank" rel="noopener">
+      <span class="link-icon orange">💬</span>
+      <span class="link-text">
+        <span class="link-title">企鹅粉丝群</span>
+        <span class="link-sub">资源更新 · 交流互助</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+  </div>
+
+  <!-- 社交小图标 -->
+  <div class="socials">
+    <a href="https://t.me/你的Telegram" target="_blank" rel="noopener" title="Telegram">✈️</a>
+    <a href="https://你的微博" target="_blank" rel="noopener" title="微博">🌐</a>
+    <a href="mailto:你的邮箱@example.com" title="邮箱">✉️</a>
+  </div>
+
+  <!-- 页脚 -->
+  <div class="footer">
+    资源均免费分享 · 无任何套路<br>
+    Powered by 单文件 HTML
+  </div>
+
+</div>
+
+<script>
+/* ================= 主题切换逻辑 ================= */
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themeToggle');
+
+  function apply(theme) {
+    root.dataset.theme = theme;
+    try { localStorage.setItem('link-theme', theme); } catch (e) {}
+    btn.setAttribute('aria-label', theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式');
+  }
+
+  btn.addEventListener('click', function () {
+    var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    apply(next);
+  });
+
+  /* 用户没手动选过时，跟随系统主题实时变化 */
+  var mq = window.matchMedia('(prefers-color-scheme: light)');
+  var onSysChange = function (e) {
+    if (!localStorage.getItem('link-theme')) {
+      root.dataset.theme = e.matches ? 'light' : 'dark';
+    }
+  };
+  if (mq.addEventListener) mq.addEventListener('change', onSysChange);
+  else if (mq.addListener) mq.addListener(onSysChange);
+})();
+</script>
+
+</body>
+</html>
